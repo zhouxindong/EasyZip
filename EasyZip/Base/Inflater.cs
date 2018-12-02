@@ -887,6 +887,32 @@ namespace EasyZip.Base
             }
         }
 
+        //public static byte[] Decompress(byte[] data)
+        //{
+        //    var input_stream = new InflaterInputStream(new MemoryStream(data));
+        //    var output_stream = new MemoryStream();
+        //    var buf = new byte[4096];
+        //    var lasting = true;
+
+        //    while (lasting)
+        //    {
+        //        var bytes_read = input_stream.Read(buf, 0, buf.Length);
+        //        if (bytes_read > 0)
+        //        {
+        //            output_stream.Write(buf, 0, bytes_read);
+        //        }
+        //        else
+        //        {
+        //            output_stream.Flush();
+        //            lasting = false;
+        //        }
+        //    }
+        //    var output_bytes = output_stream.ToArray();
+        //    //input_stream.Dispose();
+        //    //output_stream.Dispose();
+        //    return output_bytes;
+        //}
+
         #endregion
     }
 }

@@ -26,73 +26,45 @@ namespace EasyZip.Base.Streams
         /// Initialise a new instance of <see cref="InflaterInputBuffer"/>
         /// </summary>
         /// <param name="stream">The stream to buffer.</param>
-        /// <param name="bufferSize">The size to use for the buffer</param>
+        /// <param name="buffer_size">The size to use for the buffer</param>
         /// <remarks>A minimum buffer size of 1KB is permitted.  Lower sizes are treated as 1KB.</remarks>
-        public InflaterInputBuffer(Stream stream, int bufferSize)
+        public InflaterInputBuffer(Stream stream, int buffer_size)
         {
             inputStream = stream;
-            if (bufferSize < 1024)
+            if (buffer_size < 1024)
             {
-                bufferSize = 1024;
+                buffer_size = 1024;
             }
-            rawData = new byte[bufferSize];
-            clearText = rawData;
+            RawData = new byte[buffer_size];
+            ClearText = RawData;
         }
         #endregion
 
         /// <summary>
         /// Get the length of bytes bytes in the <see cref="RawData"/>
         /// </summary>
-        public int RawLength
-        {
-            get
-            {
-                return rawLength;
-            }
-        }
+        public int RawLength { get; private set; }
 
         /// <summary>
         /// Get the contents of the raw data buffer.
         /// </summary>
         /// <remarks>This may contain encrypted data.</remarks>
-        public byte[] RawData
-        {
-            get
-            {
-                return rawData;
-            }
-        }
+        public byte[] RawData { get; }
 
         /// <summary>
         /// Get the number of useable bytes in <see cref="ClearText"/>
         /// </summary>
-        public int ClearTextLength
-        {
-            get
-            {
-                return clearTextLength;
-            }
-        }
+        public int ClearTextLength { get; private set; }
 
         /// <summary>
         /// Get the contents of the clear text buffer.
         /// </summary>
-        public byte[] ClearText
-        {
-            get
-            {
-                return clearText;
-            }
-        }
+        public byte[] ClearText { get; private set; }
 
         /// <summary>
         /// Get/set the number of bytes available
         /// </summary>
-        public int Available
-        {
-            get { return available; }
-            set { available = value; }
-        }
+        public int Available { get; set; }
 
         /// <summary>
         /// Call <see cref="Inflater.SetInput(byte[], int, int)"/> passing the current clear text buffer contents.
@@ -100,10 +72,10 @@ namespace EasyZip.Base.Streams
         /// <param name="inflater">The inflater to set input for.</param>
         public void SetInflaterInput(Inflater inflater)
         {
-            if (available > 0)
+            if (Available > 0)
             {
-                inflater.SetInput(clearText, clearTextLength - available, available);
-                available = 0;
+                inflater.SetInput(ClearText, ClearTextLength - Available, Available);
+                Available = 0;
             }
         }
 
@@ -112,30 +84,25 @@ namespace EasyZip.Base.Streams
         /// </summary>
         public void Fill()
         {
-            rawLength = 0;
-            int toRead = rawData.Length;
+            RawLength = 0;
+            var to_read = RawData.Length;
 
-            while (toRead > 0)
+            while (to_read > 0)
             {
-                int count = inputStream.Read(rawData, rawLength, toRead);
+                var count = inputStream.Read(RawData, RawLength, to_read);
                 if (count <= 0)
                 {
                     break;
                 }
-                rawLength += count;
-                toRead -= count;
+                RawLength += count;
+                to_read -= count;
             }
 
-            if (cryptoTransform != null)
-            {
-                clearTextLength = cryptoTransform.TransformBlock(rawData, 0, rawLength, clearText, 0);
-            }
-            else
-            {
-                clearTextLength = rawLength;
-            }
 
-            available = clearTextLength;
+                ClearTextLength = RawLength;
+
+
+            Available = ClearTextLength;
         }
 
         /// <summary>
@@ -151,35 +118,35 @@ namespace EasyZip.Base.Streams
         /// <summary>
         /// Read a buffer directly from the input stream
         /// </summary>
-        /// <param name="outBuffer">The buffer to read into</param>
+        /// <param name="out_buffer">The buffer to read into</param>
         /// <param name="offset">The offset to start reading data into.</param>
         /// <param name="length">The number of bytes to read.</param>
         /// <returns>Returns the number of bytes read.</returns>
-        public int ReadRawBuffer(byte[] outBuffer, int offset, int length)
+        public int ReadRawBuffer(byte[] out_buffer, int offset, int length)
         {
             if (length < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(length));
             }
 
-            int currentOffset = offset;
-            int currentLength = length;
+            var current_offset = offset;
+            var current_length = length;
 
-            while (currentLength > 0)
+            while (current_length > 0)
             {
-                if (available <= 0)
+                if (Available <= 0)
                 {
                     Fill();
-                    if (available <= 0)
+                    if (Available <= 0)
                     {
                         return 0;
                     }
                 }
-                int toCopy = Math.Min(currentLength, available);
-                System.Array.Copy(rawData, rawLength - (int)available, outBuffer, currentOffset, toCopy);
-                currentOffset += toCopy;
-                currentLength -= toCopy;
-                available -= toCopy;
+                var to_copy = Math.Min(current_length, Available);
+                Array.Copy(RawData, RawLength - (int)Available, out_buffer, current_offset, to_copy);
+                current_offset += to_copy;
+                current_length -= to_copy;
+                Available -= to_copy;
             }
             return length;
         }
@@ -187,36 +154,36 @@ namespace EasyZip.Base.Streams
         /// <summary>
         /// Read clear text data from the input stream.
         /// </summary>
-        /// <param name="outBuffer">The buffer to add data to.</param>
+        /// <param name="out_buffer">The buffer to add data to.</param>
         /// <param name="offset">The offset to start adding data at.</param>
         /// <param name="length">The number of bytes to read.</param>
         /// <returns>Returns the number of bytes actually read.</returns>
-        public int ReadClearTextBuffer(byte[] outBuffer, int offset, int length)
+        public int ReadClearTextBuffer(byte[] out_buffer, int offset, int length)
         {
             if (length < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(length));
             }
 
-            int currentOffset = offset;
-            int currentLength = length;
+            var current_offset = offset;
+            var currentLength = length;
 
             while (currentLength > 0)
             {
-                if (available <= 0)
+                if (Available <= 0)
                 {
                     Fill();
-                    if (available <= 0)
+                    if (Available <= 0)
                     {
                         return 0;
                     }
                 }
 
-                int toCopy = Math.Min(currentLength, available);
-                Array.Copy(clearText, clearTextLength - (int)available, outBuffer, currentOffset, toCopy);
-                currentOffset += toCopy;
+                int toCopy = Math.Min(currentLength, Available);
+                Array.Copy(ClearText, ClearTextLength - (int)Available, out_buffer, current_offset, toCopy);
+                current_offset += toCopy;
                 currentLength -= toCopy;
-                available -= toCopy;
+                Available -= toCopy;
             }
             return length;
         }
@@ -227,16 +194,16 @@ namespace EasyZip.Base.Streams
         /// <returns>Returns the byte read.</returns>
         public int ReadLeByte()
         {
-            if (available <= 0)
+            if (Available <= 0)
             {
                 Fill();
-                if (available <= 0)
+                if (Available <= 0)
                 {
                     throw new ZipException("EOF in header");
                 }
             }
-            byte result = rawData[rawLength - available];
-            available -= 1;
+            byte result = RawData[RawLength - Available];
+            Available -= 1;
             return result;
         }
 
@@ -271,46 +238,11 @@ namespace EasyZip.Base.Streams
         /// Get/set the <see cref="ICryptoTransform"/> to apply to any data.
         /// </summary>
         /// <remarks>Set this value to null to have no transform applied.</remarks>
-        public ICryptoTransform CryptoTransform
-        {
-            set
-            {
-                cryptoTransform = value;
-                if (cryptoTransform != null)
-                {
-                    if (rawData == clearText)
-                    {
-                        if (internalClearText == null)
-                        {
-                            internalClearText = new byte[rawData.Length];
-                        }
-                        clearText = internalClearText;
-                    }
-                    clearTextLength = rawLength;
-                    if (available > 0)
-                    {
-                        cryptoTransform.TransformBlock(rawData, rawLength - available, available, clearText, rawLength - available);
-                    }
-                }
-                else
-                {
-                    clearText = rawData;
-                    clearTextLength = rawLength;
-                }
-            }
-        }
 
         #region Instance Fields
-        int rawLength;
-        byte[] rawData;
 
-        int clearTextLength;
-        byte[] clearText;
         byte[] internalClearText;
 
-        int available;
-
-        ICryptoTransform cryptoTransform;
         Stream inputStream;
         #endregion
     }
@@ -455,10 +387,7 @@ namespace EasyZip.Base.Streams
         /// <summary>
         /// Clear any cryptographic state.
         /// </summary>		
-        protected void StopDecrypting()
-        {
-            inputBuffer.CryptoTransform = null;
-        }
+
 
         /// <summary>
         /// Returns 0 once the end of the stream (EOF) has been reached.
@@ -493,6 +422,15 @@ namespace EasyZip.Base.Streams
         }
 
         #region Stream Overrides
+
+        public Stream BaseStream
+        {
+            get
+            {
+                return baseInputStream;
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether the current stream supports reading
         /// </summary>

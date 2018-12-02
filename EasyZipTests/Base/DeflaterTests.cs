@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using EasyZip.Base.Streams;
+using EasyZipTests;
 
 namespace EasyZip.Base.Tests
 {
@@ -42,62 +43,25 @@ namespace EasyZip.Base.Tests
         [TestMethod()]
         public void DeflateInflateTest()
         {
-            byte[] buffer = new byte[1000000];
-
-            var rnd = new Random();
-            rnd.NextBytes(buffer);
-
-
-            var deflated = Deflater.Do(buffer);
-            var inflated = Inflater.Do(deflated);
-
-            Assert.AreEqual(buffer.Length, inflated.Length);
-
-            for (var i = 0; i < buffer.Length; i++)
+            for (int i = 0; i < 10; i++)
             {
-                Assert.AreEqual(buffer[i], inflated[i]);
+                byte[] buffer = new byte[100000];
+
+                //var rnd = new Random();
+                //rnd.NextBytes(buffer);
+
+
+                var deflated = Deflater.Do(buffer);
+                var inflated = Inflater.Do(deflated);
+                double ratio = (double)deflated.Length/buffer.Length;
+                Assert.AreEqual(buffer.Length, inflated.Length);
+
+                var deflated_bzip = BZip2.BZip2.Compress(buffer);
+                var inflated_bzip = BZip2.BZip2.Decompress(deflated_bzip);
+                double ratio2 = (double) deflated_bzip.Length/buffer.Length;
+
+                Console.WriteLine($"Base: {ratio}, BZip2: {ratio2}");
             }
-        }
-
-        [TestMethod]
-        public void CloseDeflatorWithNestedUsing()
-        {
-            string tempFile = null;
-            try
-            {
-                tempFile = Path.GetTempPath();
-            }
-            catch (SecurityException)
-            {
-            }
-
-            Assert.IsNotNull(tempFile, "No permission to execute this test?");
-
-            tempFile = Path.Combine(tempFile, "SharpZipTest.Zip");
-            using (FileStream diskFile = File.Create(tempFile))
-            using (DeflaterOutputStream deflator = new DeflaterOutputStream(diskFile))
-            using (StreamWriter textWriter = new StreamWriter(deflator))
-            {
-                textWriter.Write("Hello");
-                textWriter.Flush();
-            }
-
-            using (FileStream diskFile = File.OpenRead(tempFile))
-            using (InflaterInputStream deflator = new InflaterInputStream(diskFile))
-            using (StreamReader textReader = new StreamReader(deflator))
-            {
-                char[] buffer = new char[5];
-                int readCount = textReader.Read(buffer, 0, 5);
-                Assert.AreEqual(5, readCount);
-
-                var b = new StringBuilder();
-                b.Append(buffer);
-                Assert.AreEqual("Hello", b.ToString());
-
-            }
-
-            File.Delete(tempFile);
-
         }
 
     }

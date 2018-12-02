@@ -54,8 +54,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Base\DeflaterTests.cs" />
+    <Compile Include="BZip2\BZip2Tests.cs" />
     <Compile Include="Checksum\Adler32Tests.cs" />
     <Compile Include="Core\NameFilterTests.cs" />
+    <Compile Include="MemInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

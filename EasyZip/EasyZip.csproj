@@ -55,6 +55,11 @@
     <Compile Include="Base\Streams\InflaterInputStream.cs" />
     <Compile Include="Base\Streams\OutputWindow.cs" />
     <Compile Include="Base\Streams\StreamManipulator.cs" />
+    <Compile Include="BZip2\BZip2.cs" />
+    <Compile Include="BZip2\BZip2Constants.cs" />
+    <Compile Include="BZip2\BZip2Exception.cs" />
+    <Compile Include="BZip2\BZip2InputStream.cs" />
+    <Compile Include="BZip2\BZip2OutputStream.cs" />
     <Compile Include="Checksum\Adler32.cs" />
     <Compile Include="Checksum\BZip2Crc.cs" />
     <Compile Include="Checksum\Crc32.cs" />

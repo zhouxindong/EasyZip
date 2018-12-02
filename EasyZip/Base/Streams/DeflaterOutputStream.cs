@@ -16,11 +16,11 @@ namespace EasyZip.Base.Streams
         /// <summary>
         /// Creates a new DeflaterOutputStream with a default Deflater and default buffer size.
         /// </summary>
-        /// <param name="baseOutputStream">
+        /// <param name="base_output_stream">
         /// the output stream where deflated output should be written.
         /// </param>
-        public DeflaterOutputStream(Stream baseOutputStream)
-            : this(baseOutputStream, new Deflater(), 512)
+        public DeflaterOutputStream(Stream base_output_stream)
+            : this(base_output_stream, new Deflater(), 512)
         {
         }
 
@@ -28,14 +28,14 @@ namespace EasyZip.Base.Streams
         /// Creates a new DeflaterOutputStream with the given Deflater and
         /// default buffer size.
         /// </summary>
-        /// <param name="baseOutputStream">
+        /// <param name="base_output_stream">
         /// the output stream where deflated output should be written.
         /// </param>
         /// <param name="deflater">
         /// the underlying deflater.
         /// </param>
-        public DeflaterOutputStream(Stream baseOutputStream, Deflater deflater)
-            : this(baseOutputStream, deflater, 512)
+        public DeflaterOutputStream(Stream base_output_stream, Deflater deflater)
+            : this(base_output_stream, deflater, 512)
         {
         }
 
@@ -43,13 +43,13 @@ namespace EasyZip.Base.Streams
         /// Creates a new DeflaterOutputStream with the given Deflater and
         /// buffer size.
         /// </summary>
-        /// <param name="baseOutputStream">
+        /// <param name="base_output_stream">
         /// The output stream where deflated output is written.
         /// </param>
         /// <param name="deflater">
         /// The underlying deflater to use
         /// </param>
-        /// <param name="bufferSize">
+        /// <param name="buffer_size">
         /// The buffer size in bytes to use when deflating (minimum value 512)
         /// </param>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -61,16 +61,16 @@ namespace EasyZip.Base.Streams
         /// <exception cref="ArgumentNullException">
         /// deflater instance is null
         /// </exception>
-        public DeflaterOutputStream(Stream baseOutputStream, Deflater deflater, int bufferSize)
+        public DeflaterOutputStream(Stream base_output_stream, Deflater deflater, int buffer_size)
         {
-            if (baseOutputStream == null)
+            if (base_output_stream == null)
             {
-                throw new ArgumentNullException(nameof(baseOutputStream));
+                throw new ArgumentNullException(nameof(base_output_stream));
             }
 
-            if (baseOutputStream.CanWrite == false)
+            if (base_output_stream.CanWrite == false)
             {
-                throw new ArgumentException("Must support writing", nameof(baseOutputStream));
+                throw new ArgumentException("Must support writing", nameof(base_output_stream));
             }
 
             if (deflater == null)
@@ -78,14 +78,14 @@ namespace EasyZip.Base.Streams
                 throw new ArgumentNullException(nameof(deflater));
             }
 
-            if (bufferSize < 512)
+            if (buffer_size < 512)
             {
-                throw new ArgumentOutOfRangeException(nameof(bufferSize));
+                throw new ArgumentOutOfRangeException(nameof(buffer_size));
             }
 
-            baseOutputStream_ = baseOutputStream;
-            buffer_ = new byte[bufferSize];
-            deflater_ = deflater;
+            BaseOutputStream = base_output_stream;
+            _buffer = new byte[buffer_size];
+            Deflater = deflater;
         }
         #endregion
 
@@ -98,39 +98,24 @@ namespace EasyZip.Base.Streams
         /// </exception>
         public virtual void Finish()
         {
-            deflater_.Finish();
-            while (!deflater_.IsFinished)
+            Deflater.Finish();
+            while (!Deflater.IsFinished)
             {
-                int len = deflater_.Deflate(buffer_, 0, buffer_.Length);
+                int len = Deflater.Deflate(_buffer, 0, _buffer.Length);
                 if (len <= 0)
                 {
                     break;
                 }
 
-                //if (cryptoTransform_ != null)
-                //{
-                //    EncryptBlock(buffer_, 0, len);
-                //}
-
-                baseOutputStream_.Write(buffer_, 0, len);
+                BaseOutputStream.Write(_buffer, 0, len);
             }
 
-            if (!deflater_.IsFinished)
+            if (!Deflater.IsFinished)
             {
                 throw new SharpZipBaseException("Can't deflate all input?");
             }
 
-            baseOutputStream_.Flush();
-
-            //if (cryptoTransform_ != null)
-            //{
-            //    if (cryptoTransform_ is ZipAESTransform)
-            //    {
-            //        AESAuthCode = ((ZipAESTransform)cryptoTransform_).GetAuthCode();
-            //    }
-            //    cryptoTransform_.Dispose();
-            //    cryptoTransform_ = null;
-            //}
+            BaseOutputStream.Flush();
         }
 
         /// <summary>
@@ -143,96 +128,9 @@ namespace EasyZip.Base.Streams
         ///	<summary>
         /// Allows client to determine if an entry can be patched after its added
         /// </summary>
-        public bool CanPatchEntries
-        {
-            get
-            {
-                return baseOutputStream_.CanSeek;
-            }
-        }
+        public bool CanPatchEntries => BaseOutputStream.CanSeek;
 
         #endregion
-
-        //#region Encryption
-
-        //string password;
-
-        //ICryptoTransform cryptoTransform_;
-
-        ///// <summary>
-        ///// Returns the 10 byte AUTH CODE to be appended immediately following the AES data stream.
-        ///// </summary>
-        //protected byte[] AESAuthCode;
-
-        ///// <summary>
-        ///// Get/set the password used for encryption.
-        ///// </summary>
-        ///// <remarks>When set to null or if the password is empty no encryption is performed</remarks>
-        //public string Password
-        //{
-        //    get
-        //    {
-        //        return password;
-        //    }
-        //    set
-        //    {
-        //        if ((value != null) && (value.Length == 0))
-        //        {
-        //            password = null;
-        //        }
-        //        else
-        //        {
-        //            password = value;
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Encrypt a block of data
-        ///// </summary>
-        ///// <param name="buffer">
-        ///// Data to encrypt.  NOTE the original contents of the buffer are lost
-        ///// </param>
-        ///// <param name="offset">
-        ///// Offset of first byte in buffer to encrypt
-        ///// </param>
-        ///// <param name="length">
-        ///// Number of bytes in buffer to encrypt
-        ///// </param>
-        //protected void EncryptBlock(byte[] buffer, int offset, int length)
-        //{
-        //    cryptoTransform_.TransformBlock(buffer, 0, length, buffer, 0);
-        //}
-
-        ///// <summary>
-        ///// Initializes encryption keys based on given <paramref name="password"/>.
-        ///// </summary>
-        ///// <param name="password">The password.</param>
-        //protected void InitializePassword(string password)
-        //{
-        //    var pkManaged = new PkzipClassicManaged();
-        //    byte[] key = PkzipClassic.GenerateKeys(ZipConstants.ConvertToArray(password));
-        //    cryptoTransform_ = pkManaged.CreateEncryptor(key, null);
-        //}
-
-        ///// <summary>
-        ///// Initializes encryption keys based on given password.
-        ///// </summary>
-        //protected void InitializeAESPassword(ZipEntry entry, string rawPassword,
-        //                                    out byte[] salt, out byte[] pwdVerifier)
-        //{
-        //    salt = new byte[entry.AESSaltLen];
-        //    // Salt needs to be cryptographically random, and unique per file
-        //    if (_aesRnd == null)
-        //        _aesRnd = RandomNumberGenerator.Create();
-        //    _aesRnd.GetBytes(salt);
-        //    int blockSize = entry.AESKeySize / 8;   // bits to bytes
-
-        //    cryptoTransform_ = new ZipAESTransform(rawPassword, salt, blockSize, true);
-        //    pwdVerifier = ((ZipAESTransform)cryptoTransform_).PwdVerifier;
-        //}
-
-        //#endregion
 
         #region Deflation Support
         /// <summary>
@@ -242,23 +140,19 @@ namespace EasyZip.Base.Streams
         /// </summary>
         protected void Deflate()
         {
-            while (!deflater_.IsNeedingInput)
+            while (!Deflater.IsNeedingInput)
             {
-                int deflateCount = deflater_.Deflate(buffer_, 0, buffer_.Length);
+                var deflate_count = Deflater.Deflate(_buffer, 0, _buffer.Length);
 
-                if (deflateCount <= 0)
+                if (deflate_count <= 0)
                 {
                     break;
                 }
-                //if (cryptoTransform_ != null)
-                //{
-                //    EncryptBlock(buffer_, 0, deflateCount);
-                //}
 
-                baseOutputStream_.Write(buffer_, 0, deflateCount);
+                BaseOutputStream.Write(_buffer, 0, deflate_count);
             }
 
-            if (!deflater_.IsNeedingInput)
+            if (!Deflater.IsNeedingInput)
             {
                 throw new SharpZipBaseException("DeflaterOutputStream can't deflate all input?");
             }
@@ -269,47 +163,25 @@ namespace EasyZip.Base.Streams
         /// <summary>
         /// Gets value indicating stream can be read from
         /// </summary>
-        public override bool CanRead
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanRead => false;
 
         /// <summary>
         /// Gets a value indicating if seeking is supported for this stream
         /// This property always returns false
         /// </summary>
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
         /// <summary>
         /// Get value indicating if this stream supports writing
         /// </summary>
-        public override bool CanWrite
-        {
-            get
-            {
-                return baseOutputStream_.CanWrite;
-            }
-        }
+        public override bool CanWrite => BaseOutputStream.CanWrite;
 
         /// <summary>
         /// Get current length of stream
         /// </summary>
-        public override long Length
-        {
-            get
-            {
-                return baseOutputStream_.Length;
-            }
-        }
+        public override long Length => BaseOutputStream.Length;
+
+        public Stream BaseStream => BaseOutputStream;
 
         /// <summary>
         /// Gets the current position within the stream.
@@ -319,7 +191,7 @@ namespace EasyZip.Base.Streams
         {
             get
             {
-                return baseOutputStream_.Position;
+                return BaseOutputStream.Position;
             }
             set
             {
@@ -378,9 +250,9 @@ namespace EasyZip.Base.Streams
         /// </summary>
         public override void Flush()
         {
-            deflater_.Flush();
+            Deflater.Flush();
             Deflate();
-            baseOutputStream_.Flush();
+            BaseOutputStream.Flush();
         }
 
         /// <summary>
@@ -389,36 +261,20 @@ namespace EasyZip.Base.Streams
         /// </summary>
         protected override void Dispose(bool disposing)
         {
-            if (!isClosed_)
-            {
-                isClosed_ = true;
+            if (_is_closed) return;
+            _is_closed = true;
 
-                try
+            try
+            {
+                Finish();
+            }
+            finally
+            {
+                if (IsStreamOwner)
                 {
-                    Finish();
-                    //if (cryptoTransform_ != null)
-                    //{
-                    //    GetAuthCodeIfAES();
-                    //    cryptoTransform_.Dispose();
-                    //    cryptoTransform_ = null;
-                    //}
-                }
-                finally
-                {
-                    if (IsStreamOwner)
-                    {
-                        baseOutputStream_.Dispose();
-                    }
+                    BaseOutputStream.Dispose();
                 }
             }
-        }
-
-        private void GetAuthCodeIfAES()
-        {
-            //if (cryptoTransform_ is ZipAESTransform)
-            //{
-            //    AESAuthCode = ((ZipAESTransform)cryptoTransform_).GetAuthCode();
-            //}
         }
 
         /// <summary>
@@ -429,7 +285,7 @@ namespace EasyZip.Base.Streams
         /// </param>
         public override void WriteByte(byte value)
         {
-            byte[] b = new byte[1];
+            var b = new byte[1];
             b[0] = value;
             Write(b, 0, 1);
         }
@@ -448,9 +304,10 @@ namespace EasyZip.Base.Streams
         /// </param>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            deflater_.SetInput(buffer, offset, count);
+            Deflater.SetInput(buffer, offset, count);
             Deflate();
         }
+
         #endregion
 
         #region Instance Fields
@@ -458,19 +315,19 @@ namespace EasyZip.Base.Streams
         /// This buffer is used temporarily to retrieve the bytes from the
         /// deflater and write them to the underlying output stream.
         /// </summary>
-        byte[] buffer_;
+        readonly byte[] _buffer;
 
         /// <summary>
         /// The deflater which is used to deflate the stream.
         /// </summary>
-        protected Deflater deflater_;
+        protected Deflater Deflater;
 
         /// <summary>
         /// Base stream the deflater depends on.
         /// </summary>
-        protected Stream baseOutputStream_;
+        protected Stream BaseOutputStream;
 
-        bool isClosed_;
+        bool _is_closed;
         #endregion
 
         #region Static Fields
@@ -479,5 +336,4 @@ namespace EasyZip.Base.Streams
         private static RandomNumberGenerator _aesRnd = RandomNumberGenerator.Create();
         #endregion
     }
-
 }
