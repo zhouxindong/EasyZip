@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EasyZip</RootNamespace>
     <AssemblyName>EasyZip</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -39,8 +42,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\Deflater.cs" />
+    <Compile Include="Base\DeflaterConstants.cs" />
+    <Compile Include="Base\DeflaterEngine.cs" />
+    <Compile Include="Base\DeflaterHuffman.cs" />
+    <Compile Include="Base\DeflaterPending.cs" />
+    <Compile Include="Base\Inflater.cs" />
+    <Compile Include="Base\InflaterDynHeader.cs" />
+    <Compile Include="Base\InflaterHuffmanTree.cs" />
+    <Compile Include="Base\PendingBuffer.cs" />
+    <Compile Include="Base\Streams\DeflaterOutputStream.cs" />
+    <Compile Include="Base\Streams\InflaterInputStream.cs" />
+    <Compile Include="Base\Streams\OutputWindow.cs" />
+    <Compile Include="Base\Streams\StreamManipulator.cs" />
+    <Compile Include="Checksum\Adler32.cs" />
+    <Compile Include="Checksum\BZip2Crc.cs" />
+    <Compile Include="Checksum\Crc32.cs" />
+    <Compile Include="Checksum\IChecksum.cs" />
+    <Compile Include="Core\Exceptions\SharpZipBaseException.cs" />
+    <Compile Include="Core\Exceptions\StreamDecodingException.cs" />
+    <Compile Include="Core\Exceptions\StreamUnsupportedException.cs" />
+    <Compile Include="Core\Exceptions\UnexpectedEndOfStreamException.cs" />
+    <Compile Include="Core\Exceptions\ValueOutOfRangeException.cs" />
+    <Compile Include="Core\Exceptions\ZipException.cs" />
+    <Compile Include="Core\FileSystemScanner.cs" />
+    <Compile Include="Core\INameTransform.cs" />
+    <Compile Include="Core\Exceptions\InvalidNameException.cs" />
+    <Compile Include="Core\IScanFilter.cs" />
+    <Compile Include="Core\NameFilter.cs" />
+    <Compile Include="Core\PathFilter.cs" />
+    <Compile Include="Core\StreamUtils.cs" />
+    <Compile Include="Core\WindowsPathUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
