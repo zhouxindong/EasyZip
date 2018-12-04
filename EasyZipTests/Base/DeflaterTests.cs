@@ -47,8 +47,8 @@ namespace EasyZip.Base.Tests
             {
                 byte[] buffer = new byte[100000];
 
-                //var rnd = new Random();
-                //rnd.NextBytes(buffer);
+                var rnd = new Random();
+                rnd.NextBytes(buffer);
 
 
                 var deflated = Deflater.Do(buffer);

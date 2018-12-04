@@ -78,6 +78,11 @@
     <Compile Include="Core\PathFilter.cs" />
     <Compile Include="Core\StreamUtils.cs" />
     <Compile Include="Core\WindowsPathUtils.cs" />
+    <Compile Include="GZip\GZip.cs" />
+    <Compile Include="GZip\GZipConstants.cs" />
+    <Compile Include="GZip\GZipException.cs" />
+    <Compile Include="GZip\GzipInputStream.cs" />
+    <Compile Include="GZip\GzipOutputStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

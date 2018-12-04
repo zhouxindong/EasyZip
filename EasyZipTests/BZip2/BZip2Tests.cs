@@ -32,7 +32,7 @@ namespace EasyZip.BZip2.Tests
 
             using (BZip2InputStream inStream = new BZip2InputStream(ms))
             {
-                byte[] buf2 = new byte[buf.Length];
+                byte[] buf2 = new byte[buf.Length]; // How can the Inflater known the length of original data?
                 int pos = 0;
                 while (true)
                 {
@@ -86,7 +86,7 @@ namespace EasyZip.BZip2.Tests
             for (int i = 0; i < 1000; i++)
             {
 
-                byte[] buffer = new byte[1000000];
+                byte[] buffer = new byte[1000];
 
                 var rnd = new Random();
                 rnd.NextBytes(buffer);
@@ -107,5 +107,34 @@ namespace EasyZip.BZip2.Tests
 
             }
         }
+
+        [TestMethod]
+        public void CreateEmptyArchive()
+        {
+            var ms = new MemoryStream();
+            var outStream = new BZip2OutputStream(ms);
+            outStream.Close();
+            ms = new MemoryStream(ms.GetBuffer());
+
+            ms.Seek(0, SeekOrigin.Begin);
+
+            using (BZip2InputStream inStream = new BZip2InputStream(ms))
+            {
+                byte[] buffer = new byte[1024];
+                int pos = 0;
+                while (true)
+                {
+                    int numRead = inStream.Read(buffer, 0, buffer.Length);
+                    if (numRead <= 0)
+                    {
+                        break;
+                    }
+                    pos += numRead;
+                }
+
+                Assert.AreEqual(pos, 0);
+            }
+        }
+
     }
 }
