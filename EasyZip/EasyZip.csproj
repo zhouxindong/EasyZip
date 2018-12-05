@@ -83,6 +83,10 @@
     <Compile Include="GZip\GZipException.cs" />
     <Compile Include="GZip\GzipInputStream.cs" />
     <Compile Include="GZip\GzipOutputStream.cs" />
+    <Compile Include="Lzw\Lzw.cs" />
+    <Compile Include="Lzw\LzwConstants.cs" />
+    <Compile Include="Lzw\LzwException.cs" />
+    <Compile Include="Lzw\LzwInputStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -58,6 +58,7 @@
     <Compile Include="Checksum\Adler32Tests.cs" />
     <Compile Include="Core\NameFilterTests.cs" />
     <Compile Include="GZip\GZipTests.cs" />
+    <Compile Include="Lzw\LzwInputStreamTests.cs" />
     <Compile Include="MemInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
