@@ -61,6 +61,10 @@
     <Compile Include="Lzw\LzwInputStreamTests.cs" />
     <Compile Include="MemInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Zip\WindowsNameTransformTests.cs" />
+    <Compile Include="Zip\ZipNameTransformTests.cs" />
+    <Compile Include="Zip\ZipTest.cs" />
+    <Compile Include="Zip\ZipTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasyZip\EasyZip.csproj">
