@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\BuiltInCompress.cs" />
     <Compile Include="Base\Deflater.cs" />
     <Compile Include="Base\DeflaterConstants.cs" />
     <Compile Include="Base\DeflaterEngine.cs" />

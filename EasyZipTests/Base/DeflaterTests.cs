@@ -19,7 +19,7 @@ namespace EasyZip.Base.Tests
         [TestMethod()]
         public void DoTest()
         {
-            byte[] buffer = new byte[100000];
+            byte[] buffer = new byte[1000000];
 
             var rnd = new Random();
             rnd.NextBytes(buffer);
@@ -43,9 +43,9 @@ namespace EasyZip.Base.Tests
         [TestMethod()]
         public void DeflateInflateTest()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
-                byte[] buffer = new byte[100000];
+                byte[] buffer = new byte[10000000];
 
                 var rnd = new Random();
                 rnd.NextBytes(buffer);

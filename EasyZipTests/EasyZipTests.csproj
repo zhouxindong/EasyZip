@@ -53,6 +53,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\BuiltInCompressTests.cs" />
     <Compile Include="Base\DeflaterTests.cs" />
     <Compile Include="BZip2\BZip2Tests.cs" />
     <Compile Include="Checksum\Adler32Tests.cs" />

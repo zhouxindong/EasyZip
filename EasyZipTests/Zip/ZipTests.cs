@@ -15,7 +15,7 @@ namespace EasyZip.Zip.Tests
         public void CompressTest()
         {
             var file_name = @"c:\temp\doc\test.docx";
-            Zip.Compress(file_name, @"c:\Code\test.zip");
+            //Zip.Compress(file_name, @"c:\Code\test.zip");
         }
     }
 }
